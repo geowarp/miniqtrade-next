@@ -22,7 +22,7 @@ export interface StocksDailyOpenCloseResponse {
 }
 
 /**
- * GET /api/ocstock?symbol=XYZ&from=YYYY-MM-DD
+ * GET /api/ocstock?symbol=XYZ&from=YYYY-MM-DD&adjusted=true
  */
 export async function GET(req: Request): Promise<NextResponse> {
   // Parse the request URL
@@ -31,6 +31,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   // Extract query string parameters
   const symbol = url.searchParams.get("symbol");
   const from = url.searchParams.get("from");
+  const adjusted = url.searchParams.get("adjusted");
 
   // Validate required parameters
   if (!symbol || !from) {
@@ -43,7 +44,9 @@ export async function GET(req: Request): Promise<NextResponse> {
   try {
     // Call Polygon.io endpoint using the extracted parameters
     const response: StocksDailyOpenCloseResponse =
-      await rest.stocks.dailyOpenClose(symbol, from);
+      await rest.stocks.dailyOpenClose(symbol, from, {
+        adjusted: adjusted === "false" ? "false" : "true",
+      });
 
     // Check for a valid response
     if (!response || response.status !== "OK") {
